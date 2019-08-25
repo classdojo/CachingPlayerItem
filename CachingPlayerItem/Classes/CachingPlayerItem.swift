@@ -173,7 +173,7 @@ open class CachingPlayerItem: AVPlayerItem {
     fileprivate let initialScheme: String?
     fileprivate var customFileExtension: String?
     
-    weak var delegate: CachingPlayerItemDelegate?
+    public weak var delegate: CachingPlayerItemDelegate?
     
     open func download() {
         if resourceLoaderDelegate.session == nil {
