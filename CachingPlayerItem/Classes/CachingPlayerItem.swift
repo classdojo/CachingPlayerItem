@@ -11,7 +11,7 @@ fileprivate extension URL {
     
 }
 
-@objc protocol CachingPlayerItemDelegate {
+@objc open protocol CachingPlayerItemDelegate {
     
     /// Is called when the media file is fully downloaded.
     @objc optional func playerItem(_ playerItem: CachingPlayerItem, didFinishDownloadingData data: Data)
