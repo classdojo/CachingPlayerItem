@@ -190,7 +190,7 @@ open class CachingPlayerItem: AVPlayerItem {
     
     /// Override/append custom file extension to URL path.
     /// This is required for the player to work correctly with the intended file type.
-    init(url: URL, customFileExtension: String?) {
+    open init(url: URL, customFileExtension: String?) {
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
             let scheme = components.scheme,
@@ -220,7 +220,7 @@ open class CachingPlayerItem: AVPlayerItem {
     }
     
     /// Is used for playing from Data.
-    init(data: Data, mimeType: String, fileExtension: String) {
+    open init(data: Data, mimeType: String, fileExtension: String) {
         
         guard let fakeUrl = URL(string: cachingPlayerItemScheme + "://whatever/file.\(fileExtension)") else {
             fatalError("internal inconsistency")
