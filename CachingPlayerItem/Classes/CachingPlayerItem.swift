@@ -11,7 +11,7 @@ fileprivate extension URL {
     
 }
 
-@objc open protocol CachingPlayerItemDelegate {
+@objc public protocol CachingPlayerItemDelegate {
     
     /// Is called when the media file is fully downloaded.
     @objc optional func playerItem(_ playerItem: CachingPlayerItem, didFinishDownloadingData data: Data)
@@ -190,7 +190,7 @@ open class CachingPlayerItem: AVPlayerItem {
     
     /// Override/append custom file extension to URL path.
     /// This is required for the player to work correctly with the intended file type.
-    open init(url: URL, customFileExtension: String?) {
+    public init(url: URL, customFileExtension: String?) {
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
             let scheme = components.scheme,
@@ -220,7 +220,7 @@ open class CachingPlayerItem: AVPlayerItem {
     }
     
     /// Is used for playing from Data.
-    open init(data: Data, mimeType: String, fileExtension: String) {
+    public init(data: Data, mimeType: String, fileExtension: String) {
         
         guard let fakeUrl = URL(string: cachingPlayerItemScheme + "://whatever/file.\(fileExtension)") else {
             fatalError("internal inconsistency")
