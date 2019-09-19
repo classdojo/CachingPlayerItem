@@ -42,6 +42,7 @@ open class CachingPlayerItem: AVPlayerItem {
         var mediaData: Data?
         var response: URLResponse?
         var pendingRequests = Set<AVAssetResourceLoadingRequest>()
+        private let pendingRequestsQueue = DispatchQueue(label: "CachingPlayerItem.pendingRequestsQueue", attributes: .serial)
         weak var owner: CachingPlayerItem?
         
         func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
@@ -61,8 +62,10 @@ open class CachingPlayerItem: AVPlayerItem {
 
                 startDataRequest(with: initialUrl)
             }
-            
-            pendingRequests.insert(loadingRequest)
+
+            pendingRequestsQueue.sync {
+                pendingRequests.insert(loadingRequest)
+            }
             processPendingRequests()
             return true
             
@@ -76,7 +79,9 @@ open class CachingPlayerItem: AVPlayerItem {
         }
         
         func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
-            pendingRequests.remove(loadingRequest)
+            pendingRequestsQueue.sync {
+                pendingRequests.remove(loadingRequest)
+            }
         }
         
         // MARK: URLSession delegate
@@ -106,19 +111,21 @@ open class CachingPlayerItem: AVPlayerItem {
         // MARK: -
         
         func processPendingRequests() {
-            
-            // get all fullfilled requests
-            let requestsFulfilled = Set<AVAssetResourceLoadingRequest>(pendingRequests.compactMap {
-                self.fillInContentInformationRequest($0.contentInformationRequest)
-                if self.haveEnoughDataToFulfillRequest($0.dataRequest!) {
-                    $0.finishLoading()
-                    return $0
-                }
-                return nil
-            })
-        
-            // remove fulfilled requests from pending requests
-            _ = requestsFulfilled.map { self.pendingRequests.remove($0) }
+
+            pendingRequestsQueue.sync {
+                // get all fullfilled requests
+                let requestsFulfilled = Set<AVAssetResourceLoadingRequest>(pendingRequests.compactMap {
+                    self.fillInContentInformationRequest($0.contentInformationRequest)
+                    if self.haveEnoughDataToFulfillRequest($0.dataRequest!) {
+                        $0.finishLoading()
+                        return $0
+                    }
+                    return nil
+                })
+
+                // remove fulfilled requests from pending requests
+                _ = requestsFulfilled.map { self.pendingRequests.remove($0) }
+            }
 
         }
         
