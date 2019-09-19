@@ -42,7 +42,7 @@ open class CachingPlayerItem: AVPlayerItem {
         var mediaData: Data?
         var response: URLResponse?
         var pendingRequests = Set<AVAssetResourceLoadingRequest>()
-        private let pendingRequestsQueue = DispatchQueue(label: "CachingPlayerItem.pendingRequestsQueue", attributes: .serial)
+        private let pendingRequestsQueue = DispatchQueue(label: "CachingPlayerItem.pendingRequestsQueue")
         weak var owner: CachingPlayerItem?
         
         func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
